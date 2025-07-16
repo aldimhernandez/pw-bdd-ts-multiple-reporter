@@ -1,0 +1,38 @@
+{
+  "name": "playwright-bdd",
+  "version": "1.0.0",
+  "description": "playwright-bdd project",
+  "keywords": [
+    "playwright",
+    "bdd",
+    "gherkin",
+    "typescript"
+  ],
+  "homepage": "https://github.com/aldimhernandez/playwright-bdd#readme",
+  "bugs": {
+    "url": "https://github.com/aldimhernandez/playwright-bdd/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aldimhernandez/playwright-bdd.git"
+  },
+  "license": "ISC",
+  "author": "https://github.com/aldimhernandez",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx bddgen && npx playwright test",
+    "test:ui": "npx bddgen && npx playwright test --ui",
+    "test:debug": "npx bddgen && npx playwright test --verbose",
+    "playwright:report": "npx playwright show-report",
+    "cucumber:report": "start reports/cucumber/index.html",
+    "test:tag": "npx bddgen --tags '@tagExample' && npx playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.52.0",
+    "@types/node": "^22.15.30",
+    "playwright-bdd": "^8.3.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
