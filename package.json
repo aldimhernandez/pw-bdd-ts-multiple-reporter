@@ -23,16 +23,16 @@
   "scripts": {
     "test": "npx bddgen && npx playwright test",
     "test:ui": "npx bddgen && npx playwright test --ui",
+    "test:tag": "npx bddgen --tags '@tagExample' && npx playwright test",
     "test:debug": "npx bddgen && npx playwright test --verbose",
-    "playwright:report": "npx playwright show-report",
-    "cucumber:report": "start reports/cucumber/index.html",
-    "test:tag": "npx bddgen --tags '@tagExample' && npx playwright test"
+    "multiple:report": "tsx config/report/multiple.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
     "@types/node": "^22.15.30",
+    "multiple-cucumber-html-reporter": "^3.9.3",
     "playwright-bdd": "^8.3.0",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }
