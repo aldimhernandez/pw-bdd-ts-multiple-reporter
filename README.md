@@ -9,6 +9,8 @@ This repository was created to **integrate Playwright with multiple-cucumber-htm
 
 ![alt text](image.png)
 
+Access the latest report [here](https://aldimhernandez.github.io/pw-bdd-ts-multiple-reporter/).
+
 My goal was to explore how to integrate Gherkin-written tests, CI/CD execution with GitHub Actions, and the automatic publishing of reports to GitHub Pages—all in a modern, reusable workflow.
 
 ---
