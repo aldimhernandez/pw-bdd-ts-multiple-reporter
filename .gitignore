@@ -3,3 +3,5 @@
 reports/
 test-results/
 node_modules/
+cucumber-report/
+cucumber-html/
