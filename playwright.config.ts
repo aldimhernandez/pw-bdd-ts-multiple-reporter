@@ -13,10 +13,11 @@ const testDir = defineBddConfig({
 export default defineConfig({
   testDir,
   reporter: [
-    cucumberReporter('html', {
-      outputFile: 'reports/cucumber/index.html',
-      externalAttachments: true,
-    }),
+    cucumberReporter('json', {
+      outputFile: `cucumber-report/json/report.json`,
+      addProjectToFeatureName: true,
+      addMetadata: 'list',
+    })
   ],
   use: {
     baseURL: 'https://playwright.dev',
@@ -24,17 +25,8 @@ export default defineConfig({
     trace: 'on',
   },
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-  ],
+    { name: 'chromium', use: devices['Desktop Chrome'] },
+    { name: 'firefox', use: devices['Desktop Firefox'] },
+    { name: 'webkit', use: devices['Desktop Safari'] },
+  ]
 });
