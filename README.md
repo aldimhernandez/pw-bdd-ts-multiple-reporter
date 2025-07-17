@@ -3,9 +3,9 @@
 [![Playwright BDD Tests](https://github.com/aldimhernandez/playwright-bdd/actions/workflows/github-actions.yml/badge.svg)](https://github.com/aldimhernandez/playwright-bdd/actions/workflows/github-actions.yml)
 [![GitHub Pages](https://img.shields.io/badge/Report-GitHub%20Pages-blue)](https://aldimhernandez.github.io/playwright-bdd/)
 
-This repository was created as a way to **experiment and learn** about end-to-end test automation using [playwright-bdd](https://vitalets.github.io/playwright-bdd/#/), combining the power of [Playwright](https://playwright.dev/) with the clarity of BDD (Behavior Driven Development) and interactive HTML reporting.
+This repository was created to **integrate Playwright with multiple-cucumber-html-reporter** and to configure the project so that additional browsers (not shown by default) can be displayed. It is a copy of [aldimhernandez/playwright-bdd](https://github.com/aldimhernandez/playwright-bdd) where the only difference is the reporter implementation.
 
-My goal was to explore how to integrate Gherkin-written tests, CI/CD execution with GitHub Actions, and automatic publishing of reports to GitHub Pages—all in a modern, reusable workflow.
+My goal was to explore how to integrate Gherkin-written tests, CI/CD execution with GitHub Actions, and the automatic publishing of reports to GitHub Pages—all in a modern, reusable workflow.
 
 ---
 
