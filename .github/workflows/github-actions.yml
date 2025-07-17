@@ -36,6 +36,9 @@ jobs:
       - name: List test-results and reports
         run: ls -R test-results || echo "No test-results" && ls -R reports || echo "No reports"
 
+      - name: Generate Multiple Report
+        run: npm run multiple:report
+
       - name: Upload Cucumber HTML report
         uses: actions/upload-artifact@v4
         with:
