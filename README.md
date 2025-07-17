@@ -5,6 +5,10 @@
 
 This repository was created to **integrate Playwright with multiple-cucumber-html-reporter** and to configure the project so that additional browsers (not shown by default) can be displayed. It is a copy of [aldimhernandez/playwright-bdd](https://github.com/aldimhernandez/playwright-bdd) where the only difference is the reporter implementation.
 
+- [Multiple Cucumber HTML Reporter](https://www.npmjs.com/package/multiple-cucumber-html-reporter)
+
+![alt text](image.png)
+
 My goal was to explore how to integrate Gherkin-written tests, CI/CD execution with GitHub Actions, and the automatic publishing of reports to GitHub Pages—all in a modern, reusable workflow.
 
 ---
@@ -13,7 +17,7 @@ My goal was to explore how to integrate Gherkin-written tests, CI/CD execution w
 
 - **BDD with Gherkin:** Tests written in natural language, easy to read and maintain.
 - **Cross-browser automation:** Thanks to Playwright, you can test on Chromium, Firefox, and WebKit.
-- **Rich HTML reports:** Each run generates a visual report with screenshots and traces for debugging.
+- **Rich Multiple Cucumber HTML Report:** Each run generates a visual report with screenshots.
 - **Real CI/CD:** Every push or PR runs the tests and publishes the report automatically to [GitHub Pages](https://aldimhernandez.github.io/playwright-bdd/).
 - **Simple and extensible example:** Perfect for anyone wanting to start experimenting with playwright-bdd and CI/CD.
 - **Page Object Model (POM):** The project uses the Page Object Model pattern. Each page or section is represented by a class (e.g., `HomePage`, `IntroPage`), making tests more maintainable and readable. Page objects are located in [`src/pages/`](src/pages/).
