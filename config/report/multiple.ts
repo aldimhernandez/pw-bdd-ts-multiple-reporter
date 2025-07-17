@@ -1,64 +1,75 @@
 import { generate } from 'multiple-cucumber-html-reporter';
 import * as fs from 'fs';
 import * as os from 'os';
-import { fileURLToPath } from 'url';
-import { dirname, join, basename } from 'path';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'path';
 
-// —————— Recrear __dirname en ESM ——————
+// —————— ESM __dirname ——————
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// —————— Ajusta según tus carpetas ——————
+// —————— Rutas ——————
 const jsonDir = join(__dirname, '../../cucumber-report/json');
-const reportPath = join(__dirname, '../../cucumber-html');
+const reportDir = join(__dirname, '../../cucumber-report/html');
 
-// 1) Leemos todos los JSON
-const files = fs
-    .readdirSync(jsonDir)
-    .filter(f => f.endsWith('.json'));
-
-// 2) Construimos la metadata.platform que necesita el template
-const platformMeta = {
-    name: os.platform(),  // 'win32' / 'linux' / 'darwin'
-    version: os.release(),   // ej. '10.0.22621'
+// —————— Browser mapping ——————
+const normalizeBrowser = (name: string): string => {
+    if (name === 'chromium') return 'chrome';
+    if (name === 'webkit') return 'safari';
+    return name;
 };
 
-// 3) “Monkey‑patch” de cada JSON para inyectar platform
-for (const file of files) {
-    const fullPath = join(jsonDir, file);
-    const features: any[] = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
+// —————— Platform meta ——————
+const platformMeta = { name: os.platform(), version: os.release() };
 
-    const patched = features.map(feature => {
-        // Si viene como array list → lo convertimos a objeto
-        if (Array.isArray(feature.metadata)) {
-            const obj: any = {};
-            feature.metadata.forEach((m: { name: string; value: any }) => {
-                const key = m.name.toLowerCase();
-                if (key === 'browser') obj.browser = { name: m.value };
-                else if (key === 'project') obj.project = m.value;
-                else obj[key] = m.value;
+// —————— JSON files ——————
+const files = fs.readdirSync(jsonDir).filter(f => f.endsWith('.json'));
+if (!files.length) throw new Error(`No JSON files in ${jsonDir}`);
+
+// —————— Patch each file ——————
+files.forEach(file => {
+    const full = join(jsonDir, file);
+    const features: any[] = JSON.parse(fs.readFileSync(full, 'utf8'));
+
+    const patched = features.map(f => {
+        let meta: any = {};
+
+        if (Array.isArray(f.metadata)) {
+            // list → object
+            f.metadata.forEach(({ name, value }: any) => {
+                const k = name.toLowerCase();
+                if (k === 'browser') meta.browser = { name: normalizeBrowser(value) };
+                else if (k === 'project') meta.project = value;
+                else meta[k] = value;
             });
-            feature.metadata = obj;
+        } else if (f.metadata && typeof f.metadata === 'object') {
+            // already object → clone & normalise browser
+            meta = { ...f.metadata };
+            if (meta.browser) {
+                if (typeof meta.browser === 'string') meta.browser = { name: normalizeBrowser(meta.browser) };
+                else if (typeof meta.browser.name === 'string') meta.browser.name = normalizeBrowser(meta.browser.name);
+            }
         }
-        // Inyectamos platform
-        feature.metadata.platform = platformMeta;
-        return feature;
+
+        meta.platform = platformMeta;
+        return { ...f, metadata: meta };
     });
 
-    fs.writeFileSync(fullPath, JSON.stringify(patched, null, 2), 'utf8');
-}
+    fs.writeFileSync(full, JSON.stringify(patched, null, 2), 'utf8');
+});
 
-// 4) Generamos el reporte HTML
+// —————— Determine global browser from first feature ——————
+const first = JSON.parse(fs.readFileSync(join(jsonDir, files[0]), 'utf8'))[0];
+const globalBrowser = normalizeBrowser(first?.metadata?.browser?.name ?? 'unknown');
+
+// —————— Generate HTML ——————
 generate({
     jsonDir,
-    reportPath,
+    reportPath: reportDir,
     openReportInBrowser: true,
     displayDuration: true,
     displayReportTime: true,
-    metadata: {
-        browser: { name: basename(files[0], '.json').replace('report-', '') },
-        platform: platformMeta,
-    },
+    metadata: { browser: { name: globalBrowser }, platform: platformMeta },
     customData: {
         title: 'Ejecución Playwright‑BDD',
         data: [
