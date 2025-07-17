@@ -22,47 +22,36 @@ const normalizeBrowser = (name: string): string => {
 // —————— Platform meta ——————
 const platformMeta = { name: os.platform(), version: os.release() };
 
-// —————— JSON files ——————
-const files = fs.readdirSync(jsonDir).filter(f => f.endsWith('.json'));
-if (!files.length) throw new Error(`No JSON files in ${jsonDir}`);
+// —————— Buscar único archivo JSON ——————
+const jsonFile = join(jsonDir, 'report.json');
+if (!fs.existsSync(jsonFile)) throw new Error(`No se encontró ${jsonFile}`);
 
-// —————— Patch each file ——————
-files.forEach(file => {
-    const full = join(jsonDir, file);
-    const features: any[] = JSON.parse(fs.readFileSync(full, 'utf8'));
+// —————— Leer y modificar el contenido ——————
+const features: any[] = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
 
-    const patched = features.map(f => {
-        let meta: any = {};
+const patched = features.map(f => {
+    const meta: any = {};
+    if (Array.isArray(f.metadata)) {
+        f.metadata.forEach(({ name, value }: any) => {
+            const k = name.toLowerCase();
+            if (k === 'browser') meta.browser = { name: normalizeBrowser(value) };
+            else if (k === 'project') meta.project = value;
+            else meta[k] = value;
+        });
+    }
 
-        if (Array.isArray(f.metadata)) {
-            // list → object
-            f.metadata.forEach(({ name, value }: any) => {
-                const k = name.toLowerCase();
-                if (k === 'browser') meta.browser = { name: normalizeBrowser(value) };
-                else if (k === 'project') meta.project = value;
-                else meta[k] = value;
-            });
-        } else if (f.metadata && typeof f.metadata === 'object') {
-            // already object → clone & normalise browser
-            meta = { ...f.metadata };
-            if (meta.browser) {
-                if (typeof meta.browser === 'string') meta.browser = { name: normalizeBrowser(meta.browser) };
-                else if (typeof meta.browser.name === 'string') meta.browser.name = normalizeBrowser(meta.browser.name);
-            }
-        }
-
-        meta.platform = platformMeta;
-        return { ...f, metadata: meta };
-    });
-
-    fs.writeFileSync(full, JSON.stringify(patched, null, 2), 'utf8');
+    meta.device = os.hostname();
+    meta.platform = platformMeta;
+    return { ...f, metadata: meta };
 });
 
-// —————— Determine global browser from first feature ——————
-const first = JSON.parse(fs.readFileSync(join(jsonDir, files[0]), 'utf8'))[0];
-const globalBrowser = normalizeBrowser(first?.metadata?.browser?.name ?? 'unknown');
+// Guardar archivo actualizado
+fs.writeFileSync(jsonFile, JSON.stringify(patched, null, 2), 'utf8');
 
-// —————— Generate HTML ——————
+// —————— Obtener browser global del primer feature ——————
+const globalBrowser = patched[0]?.metadata?.browser?.name ?? 'unknown';
+
+// —————— Generar reporte HTML ——————
 generate({
     jsonDir,
     reportPath: reportDir,
@@ -71,10 +60,12 @@ generate({
     displayReportTime: true,
     metadata: { browser: { name: globalBrowser }, platform: platformMeta },
     customData: {
-        title: 'Ejecución Playwright‑BDD',
+        title: 'Ejecución Playwright‑BDD Prueba',
         data: [
             { label: 'Fecha', value: new Date().toLocaleString() },
             { label: 'Sistema', value: `${os.platform()} ${os.release()}` },
+            { label: 'Equipo', value: os.hostname() },
+            { label: 'Usuario', value: os.userInfo().username }
         ]
     }
 });
