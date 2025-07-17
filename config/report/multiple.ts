@@ -5,10 +5,11 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'path';
 
 // —————— ESM __dirname ——————
+// ESM __dirname equivalent
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// —————— Rutas ——————
+// —————— Paths ——————
 const jsonDir = join(__dirname, '../../cucumber-report/json');
 const reportDir = join(__dirname, '../../cucumber-report/html');
 
@@ -19,14 +20,14 @@ const normalizeBrowser = (name: string): string => {
     return name;
 };
 
-// —————— Platform meta ——————
+// —————— Platform metadata ——————
 const platformMeta = { name: os.platform(), version: os.release() };
 
-// —————— Buscar único archivo JSON ——————
+// —————— Find single JSON file ——————
 const jsonFile = join(jsonDir, 'report.json');
-if (!fs.existsSync(jsonFile)) throw new Error(`No se encontró ${jsonFile}`);
+if (!fs.existsSync(jsonFile)) throw new Error(`Could not find ${jsonFile}`);
 
-// —————— Leer y modificar el contenido ——————
+// —————— Read and modify the content ——————
 const features: any[] = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
 
 const patched = features.map(f => {
@@ -45,13 +46,13 @@ const patched = features.map(f => {
     return { ...f, metadata: meta };
 });
 
-// Guardar archivo actualizado
+// Save updated file
 fs.writeFileSync(jsonFile, JSON.stringify(patched, null, 2), 'utf8');
 
-// —————— Obtener browser global del primer feature ——————
+// —————— Get global browser from the first feature ——————
 const globalBrowser = patched[0]?.metadata?.browser?.name ?? 'unknown';
 
-// —————— Generar reporte HTML ——————
+// —————— Generate HTML report ——————
 generate({
     jsonDir,
     reportPath: reportDir,
@@ -60,12 +61,12 @@ generate({
     displayReportTime: true,
     metadata: { browser: { name: globalBrowser }, platform: platformMeta },
     customData: {
-        title: 'Ejecución Playwright‑BDD Prueba',
+        title: 'Playwright BDD and Multiple Cucumber HTML Report Integration Test',
         data: [
-            { label: 'Fecha', value: new Date().toLocaleString() },
-            { label: 'Sistema', value: `${os.platform()} ${os.release()}` },
-            { label: 'Equipo', value: os.hostname() },
-            { label: 'Usuario', value: os.userInfo().username }
+            { label: 'Date', value: new Date().toLocaleString() },
+            { label: 'System', value: `${os.platform()} ${os.release()}` },
+            { label: 'Machine', value: os.hostname() },
+            { label: 'User', value: os.userInfo().username }
         ]
     }
 });
